@@ -10,7 +10,7 @@ import { tokenName } from '@angular/compiler';
 export class AnalisiServiceService {
 
   constructor(private http: HttpClient ,public t:StorageTokenService) { }
-  private readonly host = "http://localhost:4000/api";
+  private readonly host = "https://polo-nord-backend.azurewebsites.net/api";
 
   public headers_object = new HttpHeaders().set("Authorization", "Bearer " + this.t.getToken());
 

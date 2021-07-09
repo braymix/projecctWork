@@ -7,7 +7,7 @@ import { Observable } from "rxjs";
 })
 export class ApiServiceService {
 
-  private readonly host = "http://localhost:4000/api"
+  private readonly host = "https://polo-nord-backend.azurewebsites.net/api"
   constructor(private http: HttpClient) {}
 
   public login(body: any): Observable<any> {

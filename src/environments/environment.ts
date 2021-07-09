@@ -5,7 +5,7 @@
 
 export const environment = {
   production: false,
-  host: "http://localhost:4000/api/",
+  host: "https://polo-nord-backend.azurewebsites.net/api/",
   endpoint: {
     'articoli': 'articoli/',
     'ordini': 'ordini/',

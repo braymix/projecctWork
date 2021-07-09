@@ -1,7 +1,6 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { Observable } from "rxjs";
-import { environment } from "../../environments/environment";
 import { ArticoliOrdinatiDto } from "./articoliOrdinati.service";
 
 export interface OrdiniDto {
@@ -41,15 +40,33 @@ export interface OrdiniDto {
 })
 export class OrdiniService {
   constructor(private http: HttpClient) {}
-
+  environment = {
+    production: false,
+    host: "https://polo-nord-backend.azurewebsites.net/api/",
+    endpoint: {
+      'articoli': 'articoli/',
+      'ordini': 'ordini/',
+      'acquisti': 'acquisti/',
+      'fornitori': 'fornitori/',
+      'carico': 'carico/',
+      'asin': 'asin/',
+      'titolo': 'titolo/',
+      'categoria' : 'categoria/',
+      'addLastOrders': 'addLastOrders/',
+      'prezzo': 'prezzo',
+      'allCategorie' : 'allCategorie',
+      'globalFilter': 'globalFilter',
+      'articoliAcquistati': 'articoliAcquistati/'
+    }
+  }
   getAll(
     page: number = 1,
     resultsPerPage: number = null,
     sort: string = null
   ): Observable<any> {
     const url =
-      environment.host +
-      environment.endpoint.ordini +
+      this.environment.host +
+      this.environment.endpoint.ordini +
       "?page=" +
       (Number.isNaN(page) ? 0 : page - 1) +
       (resultsPerPage !== null ? "&resultsPerPage=" + resultsPerPage : "") +
@@ -60,9 +77,9 @@ export class OrdiniService {
 
   addLastOrders(): Observable<any> {
     return this.http.post(
-      environment.host +
-        environment.endpoint.ordini +
-        environment.endpoint.addLastOrders,
+      this.environment.host +
+        this.environment.endpoint.ordini +
+        this.environment.endpoint.addLastOrders,
       null
     );
   }
@@ -74,8 +91,8 @@ export class OrdiniService {
     sort: string = null
   ): Observable<any> {
     const url =
-      environment.host +
-      environment.endpoint.ordini +
+      this.environment.host +
+      this.environment.endpoint.ordini +
       "?field=" +
       field +
       "&page=" +

@@ -1,7 +1,6 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { Observable } from "rxjs";
-import { environment } from "../../environments/environment";
 import { FornitoriDto } from "../interfaces/fornitoriDto";
 import { ArticoliAcquistatiDto } from "./articoliAcquistati.service";
 
@@ -20,8 +19,29 @@ export interface AcquistiDto {
 })
 export class AcquistiService {
 
+environment = {
+        production: false,
+        host: "https://polo-nord-backend.azurewebsites.net/api/",
+        endpoint: {
+          'articoli': 'articoli/',
+          'ordini': 'ordini/',
+          'acquisti': 'acquisti/',
+          'fornitori': 'fornitori/',
+          'carico': 'carico/',
+          'asin': 'asin/',
+          'titolo': 'titolo/',
+          'categoria' : 'categoria/',
+          'addLastOrders': 'addLastOrders/',
+          'prezzo': 'prezzo',
+          'allCategorie' : 'allCategorie',
+          'globalFilter': 'globalFilter',
+          'articoliAcquistati': 'articoliAcquistati/'
+        }
+    }
+      
+
     constructor(
-        private http: HttpClient
+        private http: HttpClient,
     ){}
 
     getAll(
@@ -30,7 +50,7 @@ export class AcquistiService {
         sort: string = null
     ): Observable<any> {
 
-        const url = environment.host + environment.endpoint.acquisti +
+        const url = this.environment.host + this.environment.endpoint.acquisti +
         '?page=' + (Number.isNaN(page) ? 0 : page - 1) +
         (resultsPerPage !== null ? '&resultsPerPage=' + resultsPerPage : '') +
         (sort ? '&order=' + sort : '');
@@ -39,7 +59,7 @@ export class AcquistiService {
     }
 
     caricoMagazzino(acquisto: AcquistiDto): Observable<any> {
-        const url = environment.host + environment.endpoint.acquisti + environment.endpoint.carico;
+        const url = this.environment.host + this.environment.endpoint.acquisti + this.environment.endpoint.carico;
         return this.http.patch(url, acquisto);
     }
 
@@ -50,7 +70,7 @@ export class AcquistiService {
         sort: string = null
     ): Observable<any> {
 
-        const url = environment.host + environment.endpoint.acquisti +
+        const url = this.environment.host + this.environment.endpoint.acquisti +
         '?field=' + field +
         '&page=' + (Number.isNaN(page) ? 0 : page - 1) +
         (resultsPerPage !== null ? '&resultsPerPage=' + resultsPerPage : '') +
@@ -60,11 +80,11 @@ export class AcquistiService {
     }
 
     saveOrUpdate(acquisto: any): Observable<any> {
-        return this.http.post(environment.host + environment.endpoint.acquisti, acquisto);
+        return this.http.post(this.environment.host + this.environment.endpoint.acquisti, acquisto);
     }
 
     delete(id: number): Observable<any> {
-        return this.http.delete(environment.host + environment.endpoint.acquisti + "delete/" + id);
+        return this.http.delete(this.environment.host + this.environment.endpoint.acquisti + "delete/" + id);
     }
 
 }

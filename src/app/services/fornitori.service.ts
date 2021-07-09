@@ -1,7 +1,6 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { Observable } from "rxjs";
-import { environment } from "../../environments/environment";
 
 export interface FornitoriDto {
     fornitoreId: number;
@@ -16,6 +15,25 @@ export class FornitoriService {
     constructor(
         private http: HttpClient
     ){}
+    environment = {
+        production: false,
+        host: "https://polo-nord-backend.azurewebsites.net/api/",
+        endpoint: {
+          'articoli': 'articoli/',
+          'ordini': 'ordini/',
+          'acquisti': 'acquisti/',
+          'fornitori': 'fornitori/',
+          'carico': 'carico/',
+          'asin': 'asin/',
+          'titolo': 'titolo/',
+          'categoria' : 'categoria/',
+          'addLastOrders': 'addLastOrders/',
+          'prezzo': 'prezzo',
+          'allCategorie' : 'allCategorie',
+          'globalFilter': 'globalFilter',
+          'articoliAcquistati': 'articoliAcquistati/'
+        }
+      }
 
     getAll(
         page: number = 1,
@@ -23,7 +41,7 @@ export class FornitoriService {
         sort: string = null
     ): Observable<any> {
 
-        const url = environment.host + environment.endpoint.fornitori +
+        const url = this.environment.host + this.environment.endpoint.fornitori +
         '?page=' + (Number.isNaN(page) ? 0 : page - 1) +
         (resultsPerPage !== null ? '&resultsPerPage=' + resultsPerPage : '') +
         (sort ? '&order=' + sort : '');

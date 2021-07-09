@@ -1,7 +1,6 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { Observable } from "rxjs";
-import { environment } from "../../environments/environment";
 import { InsertItemDto } from "../interfaces/insertItemDto";
 import { ArticoliDto } from "./articoli.service";
 
@@ -22,17 +21,36 @@ export class ArticoliAcquistatiService {
     constructor(
         private http: HttpClient
     ){}
+    environment = {
+        production: false,
+        host: "https://polo-nord-backend.azurewebsites.net/api/",
+        endpoint: {
+          'articoli': 'articoli/',
+          'ordini': 'ordini/',
+          'acquisti': 'acquisti/',
+          'fornitori': 'fornitori/',
+          'carico': 'carico/',
+          'asin': 'asin/',
+          'titolo': 'titolo/',
+          'categoria' : 'categoria/',
+          'addLastOrders': 'addLastOrders/',
+          'prezzo': 'prezzo',
+          'allCategorie' : 'allCategorie',
+          'globalFilter': 'globalFilter',
+          'articoliAcquistati': 'articoliAcquistati/'
+        }
+      }
 
     saveOrUpdate(articolo: ArticoliAcquistatiDto): Observable<any> {
-        return this.http.post(environment.host + environment.endpoint.articoliAcquistati, articolo);
+        return this.http.post(this.environment.host + this.environment.endpoint.articoliAcquistati, articolo);
     }
 
     delete(id: number): Observable<any> {
-        return this.http.delete(environment.host + environment.endpoint.articoliAcquistati + "delete/" + id);
+        return this.http.delete(this.environment.host + this.environment.endpoint.articoliAcquistati + "delete/" + id);
     }
     
     insert(insertItemDto: InsertItemDto): Observable<any> {
-        return this.http.post(environment.host + environment.endpoint.articoliAcquistati + insertItemDto.idAcquisto, insertItemDto);
+        return this.http.post(this.environment.host + this.environment.endpoint.articoliAcquistati + insertItemDto.idAcquisto, insertItemDto);
     }
 
 }

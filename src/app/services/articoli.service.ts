@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {Observable} from 'rxjs';
-import {environment} from '../../environments/environment';
+
 import { EntityRequestFilter } from '../interfaces/entityRequestFilter';
 
 export interface ArticoliDto {
@@ -26,11 +26,30 @@ export class ArticoliService {
     private http: HttpClient
   ) {
   }
+  environment = {
+    production: false,
+    host: "https://polo-nord-backend.azurewebsites.net/api/",
+    endpoint: {
+      'articoli': 'articoli/',
+      'ordini': 'ordini/',
+      'acquisti': 'acquisti/',
+      'fornitori': 'fornitori/',
+      'carico': 'carico/',
+      'asin': 'asin/',
+      'titolo': 'titolo/',
+      'categoria' : 'categoria/',
+      'addLastOrders': 'addLastOrders/',
+      'prezzo': 'prezzo',
+      'allCategorie' : 'allCategorie',
+      'globalFilter': 'globalFilter',
+      'articoliAcquistati': 'articoliAcquistati/'
+    }
+  }
 
   getAll(page: number = 1, resultsPerPage: number = null, sort: string = null): Observable<any> { // parametri
 
     // costruisco la paginazione
-    const url = environment.host + environment.endpoint.articoli +
+    const url = this.environment.host + this.environment.endpoint.articoli +
       '?page=' + (Number.isNaN(page) ? 0 : page - 1) +
       (resultsPerPage !== null ? '&resultsPerPage=' + resultsPerPage : '') +
       (sort ? '&order=' + sort : '');
@@ -39,17 +58,17 @@ export class ArticoliService {
   }
 
   getByAsin(asin: string): Observable<any> {
-    const url = environment.host + environment.endpoint.articoli + environment.endpoint.asin + asin;
+    const url = this.environment.host + this.environment.endpoint.articoli + this.environment.endpoint.asin + asin;
     return this.http.get(url);
   }
 
   getByTitle(titolo: string): Observable<any> {
-    const url = environment.host + environment.endpoint.articoli + environment.endpoint.titolo + titolo;
+    const url = this.environment.host + this.environment.endpoint.articoli + this.environment.endpoint.titolo + titolo;
     return this.http.get(url);
   }
 
   getByCategoria(categoria: string, page: number = 1, resultsPerPage: number = null, sort: string = null): Observable<any> {
-    const url = environment.host + environment.endpoint.articoli + environment.endpoint.categoria + categoria +
+    const url = this.environment.host + this.environment.endpoint.articoli + this.environment.endpoint.categoria + categoria +
       '?page=' + (Number.isNaN(page) ? 0 : page - 1) +
       (resultsPerPage !== null ? '&resultsPerPage=' + resultsPerPage : '') +
       (sort ? '&order=' + sort : '');
@@ -57,12 +76,12 @@ export class ArticoliService {
   }
 
   getAllCategorie(): Observable<any> {
-    const url = environment.host + environment.endpoint.articoli + environment.endpoint.categoria + environment.endpoint.allCategorie;
+    const url = this.environment.host + this.environment.endpoint.articoli + this.environment.endpoint.categoria + this.environment.endpoint.allCategorie;
     return this.http.get(url);
   }
 
   rangePrezzo(prezzo1: number, prezzo2: number, page: number = 1, resultsPerPage: number = null, sort: string = null): Observable<any> {
-    const url = environment.host + environment.endpoint.articoli + environment.endpoint.prezzo +
+    const url = this.environment.host + this.environment.endpoint.articoli + this.environment.endpoint.prezzo +
       '?prezzo1=' + prezzo1 + '&prezzo2=' + prezzo2 +
       '&page=' + (Number.isNaN(page) ? 0 : page - 1) +
       (resultsPerPage !== null ? '&resultsPerPage=' + resultsPerPage : '') +
@@ -77,7 +96,7 @@ export class ArticoliService {
     sort: string = null
     ): Observable<any> {
 
-    const url = environment.host + environment.endpoint.articoli + environment.endpoint.globalFilter +
+    const url = this.environment.host + this.environment.endpoint.articoli + this.environment.endpoint.globalFilter +
     '?page=' + (Number.isNaN(page) ? 0 : page - 1) +
     (resultsPerPage !== null ? '&resultsPerPage=' + resultsPerPage : '') +
     (sort ? '&order=' + sort : '');

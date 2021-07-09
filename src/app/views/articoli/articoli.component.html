@@ -1,0 +1,157 @@
+<div class="card">
+  <p-dataView #dt
+    [(first)]="first"
+    [value]="data"
+    [paginator]="true"
+    [rows]="resultsPerPage"
+    [sortField]="sortField"
+    [sortOrder]="sortOrder"
+    [totalRecords]="totalRecords"
+    [lazy]="true"
+    (onLazyLoad)="lazyLoad($event)"
+    filterBy="titolo"
+    layout="grid">
+
+    <ng-template pTemplate="header">
+      <div class="row m-0">
+        <div class="col-md-4 align-self-center">
+          <p-dropdown [options]="sortOptions" [(ngModel)]="sortKey" placeholder="Ordina per"
+                      (onChange)="onSortChange($event)" styleClass="p-mb-2 p-mb-md-0" class="p-col-3"></p-dropdown>
+          <button pButton (click)="showPositionDialog('top')" icon="pi pi-sliders-h" class="p-col-2"></button>
+        </div>
+        <div class="col-md-4 align-self-center">
+          <div class="input-prepend input-group search">
+            <div class="input-group-prepend">
+              <span class="input-group-text"><i class="fa fa-search"></i></span>
+            </div>
+            <input type="search" class="text-center form-control" id="search" placeholder="Cerca per titolo..." (input)="filter($event)" style="width:auto">
+          </div>
+        </div>
+        <div class="col-md-2"></div>
+        <div class="col-md-2" style="text-align: end; padding-right: 2rem;">
+          <p-dataViewLayoutOptions class="p-col-1 p-offset-3"></p-dataViewLayoutOptions>
+        </div>
+      </div>
+    </ng-template>
+
+    <ng-template let-dato pTemplate="listItem">
+      <div class="p-col-12">
+        <div class="product-list-item">
+          <img [src]=dato.pathImmagine [alt]="dato.pathImmagine"/>
+          <div class="product-list-detail">
+            <div class="product-name">{{dato.titolo}}</div>
+            <div class="product-description">{{dato.brand}}</div>
+            <i class="pi pi-tag product-category-icon"></i><span class="product-category">{{dato.categoria}}</span>
+          </div>
+          <div class="product-list-action">
+            <span class="product-price">€ {{dato.prezzo}}</span>
+            <p-button icon="pi pi-shopping-cart" label="Carrello" title="Aggiungi al carrello"></p-button>
+          </div>
+        </div>
+      </div>
+    </ng-template>
+
+    <ng-template let-dato pTemplate="gridItem">
+      <div class="p-col-12 p-md-4">
+        <div class="product-grid-item card" style="padding: 10px;">
+          <div class="product-grid-item-top">
+            <div>
+              <i class="pi pi-tag product-category-icon"></i>
+              <span class="product-category">{{dato.categoria}}</span>
+            </div>
+          </div>
+          <div class="product-grid-item-content" (click)="dettaglioArticolo(dato)" style="cursor: pointer;">
+            <img [src]=dato.pathImmagine [alt]="dato.pathImmagine" />
+            <div class="product-name">{{dato.name}}</div>
+            <div class="product-description">{{dato.titolo}}</div>
+          </div>
+          <div class="product-grid-item-bottom">
+            <span class="product-price">€ {{dato.prezzo}}</span>
+            <p-button icon="pi pi-shopping-cart" label="Carrello" title="Aggiungi al carrello" (click)="addToCart(dato)"></p-button>
+          </div>
+        </div>
+      </div>
+    </ng-template>
+  </p-dataView>
+  <p-toast [baseZIndex]="2000"></p-toast>
+
+
+  <p-dialog header="Dettaglio ordinamento"
+    [(visible)]="displayPosition"
+    [position]="position"
+    [style]="{width: '35vw'}"
+    [baseZIndex]="10000"
+    [draggable]="true"
+    [resizable]="false">
+
+      <div class="row align-items-center">
+        <div class="p-col-3">
+          <span><i class="pi pi-sort"></i> <strong>Ordina per:</strong> </span>
+        </div>
+        <div class="p-col-6">
+          <p-dropdown [options]="sortOptions"
+                      [(ngModel)]="sortKey"
+                      placeholder="Scegli l'ordinamento"
+                      (onChange)="onSortChange($event)"
+                      styleClass="p-mb-2 p-mb-md-0"
+                      class="p-col-3">
+          </p-dropdown>
+        </div>
+        <div class="p-col-3">
+          <p-toggleButton #tb [(ngModel)]="checkedOrd"
+                          (onChange)="handleChangeOrder($event)"
+                          onLabel="ASC" offLabel="DESC"
+                          onIcon="pi pi-sort-amount-down-alt" offIcon="pi pi-sort-amount-up"
+                          class="p-col-2 p-mt-1 p-offset-2 mx-auto">
+          </p-toggleButton>
+        </div>
+      </div>
+
+      <div class="row align-items-center">
+        <div class="p-col-3">
+          <span><i class="pi pi-tags"></i> <strong>Categoria:</strong> </span>
+        </div>
+        <div class="p-col-6">
+          <p-autoComplete [(ngModel)]="selectedCategoria"
+                          [suggestions]="filteredCategoria"
+                          (completeMethod)="filterCategory($event)"
+                          (onSelect)="chooseCategory()"
+                          (onClear)="onClear($event)"
+                          styleClass="p-mb-2 p-mb-md-0"
+                          class="p-col-3"
+                          [showEmptyMessage]="true"
+                          [emptyMessage]="'Nessun risultato trovato'"
+                          placeholder="Scrivi la categoria">
+            <ng-template let-data pTemplate="item">
+              <div>{{data}}</div>
+            </ng-template>
+          </p-autoComplete>
+        </div>
+      </div>
+
+      <div class="row align-items-center">
+        <div class="p-col-5">
+          <h5>Prezzo da {{rangeValues[0]}} € a {{rangeValues[1]}} €</h5>
+        </div>
+        <div class="p-col-6">
+          <p-slider [(ngModel)]="rangeValues" (onChange)="onChange($event.values)" (onSlideEnd)="onSlideEnd()" [max]="maxPrezzoRange" [range]="true"></p-slider>
+        </div>
+      </div>
+
+      <div class="row align-items-center">
+        <div class="p-col-7">
+          <h5>Giacenza: {{descrizioneGiacenza}}</h5>
+        </div>
+        <div class="p-col-4">
+          <p-slider class="giacenza" [(ngModel)]="sliderGiacenza" [min]="0" [max]="3" [step]="1"
+            (onChange)="onChangeGiacenza($event.value)" (onSlideEnd)="onSlideEndGiacenza()">
+          </p-slider>
+        </div>
+      </div>
+
+      <ng-template pTemplate="footer">
+        <p-button icon="pi pi-check" (click)="displayPosition=false" label="Ok" styleClass="p-button-text"></p-button>
+      </ng-template>
+  </p-dialog>
+
+</div>

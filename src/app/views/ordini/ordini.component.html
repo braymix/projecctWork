@@ -1,0 +1,35 @@
+<div class="card">
+
+   <h1 style="text-align: center;padding: 6px;margin: 0;">Lista delle vendite</h1>
+
+   <div *ngIf="errors.length === 0">
+
+      <app-table-row-expansion
+      [tableName]="tableName"
+      [rows]="orders"
+      [rowID]="rowID"
+      [expandedRowID]="expandedRowID"
+      [columns]="columns"
+      [columnsRowExpanded]="columnsRowExpanded"
+      [loading]="loading"
+      [totalRecords]="totalRecords"
+      [resultsPerPage]="resultsPerPage"
+      [reorderableColumns]="reorderableColumns"
+      [multiSort]="multiSort"
+      [loadingSpinner]="loadingSpinner"
+      [search]="search"
+      [first]="first"
+      (loadLazyEvent)="lazyLoad($event)"
+      (changeResultsPerPageEvent)="onChangeResultsPerPage($event)"
+      (pageChanged)="onPageChanged($event)"
+      (generateToast)="generateToast($event)"
+      (loadOrdiniEvent)="loadOrdini()"
+      (searchEvent)="searchEvent($event)"
+      (sorting)="sorting($event)">
+      </app-table-row-expansion> 
+
+      <p-toast [baseZIndex]="2000"></p-toast>
+      
+   </div>
+
+</div>

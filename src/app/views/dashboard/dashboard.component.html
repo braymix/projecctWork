@@ -1,0 +1,14 @@
+<p-card>
+  <div *ngIf="loading" class="d-flex align-items-center">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-5 mx-auto" style="text-align: center; font-size: 20px;">
+          <strong>Aggiornamento degli ordini in corso...</strong>
+          <p-progressBar mode="indeterminate" [style]="{'height': '10px'}"></p-progressBar>
+        </div>
+      </div>
+    </div>
+  </div>
+  <p-toast [baseZIndex]="2000"></p-toast>
+  <app-analisi-ordini></app-analisi-ordini>
+</p-card>

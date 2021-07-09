@@ -1,0 +1,158 @@
+<div class="card">
+
+    <h1 style="text-align: center;padding: 6px;margin: 0;">Carrello</h1>
+
+    <div class="row" style="padding-left: 15px; padding-right: 15px;">
+
+        <div class="col-md-9">
+            <div class="card">
+
+                <p-table #dt 
+                    [columns]="selectedColumns" 
+                    [value]="selectedItems" 
+                    [lazy]="true" 
+                    [responsive]="true"
+                    [loading]="loading" 
+                    [paginator]="selectedItems.length == 0 ? false : true" 
+                    [rows]="resultsPerPage" 
+                    [totalRecords]="totalRecords"
+                    [(first)]="first"
+                    (onLazyLoad)="lazyLoad()"
+                    [reorderableColumns]="reorderableColumns" 
+                    [dataKey]="rowID">
+
+                    <ng-template pTemplate="caption">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <p-multiSelect [options]="columns" [(ngModel)]="selectedColumns" optionLabel="header"
+                                    selectedItemsLabel="{0} colonne selezionate" [style]="{minWidth: '200px'}"
+                                    placeholder="Scegli le colonne">
+                                </p-multiSelect>
+                            </div>
+                        </div>
+                    </ng-template>
+
+                    <ng-template pTemplate="header">
+                        <tr>
+                            <th *ngFor="let column of selectedColumns" pReorderableColumn style="text-align: center;">
+                                {{column.header}}
+                            </th>
+                            <th pReorderableColumn style="text-align: center;">
+                                Prezzo
+                            </th>
+                            <th style="text-align: center;">
+                                Quantità
+                            </th>
+                            <th style="width: 100px; text-align: center;">
+                                Rimuovi
+                            </th>
+                        </tr>
+                    </ng-template>
+
+                    <ng-template pTemplate="body" let-row>
+                        <tr>
+                            <td *ngFor="let col of selectedColumns" style="text-align: center;"> {{row.item[col.field]}}
+                            </td>
+                            <td style="text-align: center;"> {{toString(row.item["prezzo"])}} € </td>
+                            <td class="p-fluid p-field" pEditableColumn style="text-align: center;">
+                                <p-cellEditor>
+                                    <ng-template pTemplate="input">
+                                        <p-inputNumber [(ngModel)]="row.quantita" [size]="20" mode="decimal"
+                                            [showButtons]="true" [min]="1" [max]="100" (onInput)="onInput($event, row)">
+                                        </p-inputNumber>
+                                    </ng-template>
+                                    <ng-template pTemplate="output">
+                                        <p-inputNumber [(ngModel)]="row.quantita" [size]="20" mode="decimal"
+                                            [showButtons]="true" [min]="1" [max]="100" (onInput)="onInput($event, row)">
+                                        </p-inputNumber>
+                                    </ng-template>
+                                </p-cellEditor>
+                            </td>
+                            <td style="text-align: center;">
+                                <button pButton pRipple type="button" icon="pi pi-times"
+                                    class="p-button-rounded p-button-danger" (click)="remove(row)"></button>
+                            </td>
+                        </tr>
+                    </ng-template>
+
+                    <ng-template pTemplate="summary">
+                        {{ !loading ? (totalRecords === 0 ? 'Non ci sono elementi' : totalRecords === 1 ? 'C\'è un elemento' : 'Ci sono ' + totalRecords + ' elementi') : 'Caricamento...' }}
+                    </ng-template>
+
+                </p-table>
+
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card">
+
+                <h3 style="text-align: center;padding: 6px;margin: 0;">Riepilogo</h3>
+
+                <p-table #dt1
+                    [value]="carrello" 
+                    [scrollable]="carrello.length > 4 ? true : false" 
+                    scrollHeight="235px">
+                    <ng-template pTemplate="header">
+                        <tr>
+                            <th style="width: 11rem;">Descrizione</th>
+                            <th style="text-align: right;">Prezzo</th>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="body" let-row>
+                        <tr>
+                            <td>{{row.item.titolo}}</td>
+                            <td style="text-align: right;">{{toString(getPrezzo(row))}} €</td>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="summary">
+                        <div>
+                            <strong>Totale</strong>
+                            <strong style="float: right;">{{toString(getTotale())}} €</strong>
+                        </div>
+                    </ng-template>
+                </p-table>
+
+                <div class="row" style="padding: 1.5rem; padding-bottom: 0rem;" *ngIf="fornitori">
+                    <div class="col-12 p-fluid p-field">
+                        <form [formGroup]="form" class="pt-3 pl-3 pr-3 pb-3" novalidate>
+                            <div class="form-group row align-items-center">
+                                <div class="col-12">
+                                    <span class="p-float-label">
+                                        <p-dropdown id="fornitore" [showClear]="true" formControlName="fornitore"
+                                            [options]="fornitori" [autoDisplayFirst]="false"
+                                            optionLabel="nome" optionValue="fornitoreId"></p-dropdown>
+                                        <label for="fornitore">Seleziona il fornitore</label>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="row" style="margin-top: 2rem;">
+                                <div class="col-12">
+                                    <span class="p-float-label">
+                                        <input type="text" id="numeroFattura" formControlName="numeroFattura" 
+                                            pInputText [(ngModel)]="value1"> 
+                                        <label for="numeroFattura">Numero fattura</label>
+                                    </span>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div class="row" style="padding: 1.3rem; padding-top: 0rem; align-self: center;">
+                    <div class="col-12">
+                        <span class="p-float-label">
+                            <button pButton pRipple type="submit" label="Effettua acquisto" class="p-button-success"
+                                (click)="effettuaAcquisto()" [disabled]="f.fornitore.errors || isDisabled || carrello.length == 0">
+                            </button>
+                        </span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <p-toast [baseZIndex]="2000"></p-toast>
+
+    </div>
+
+</div>

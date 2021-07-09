@@ -1,0 +1,52 @@
+<p-card>
+  <div class="mb-3 mt-3" style="text-align: center;"><h1><b>Pagina di Analisi</b></h1></div>
+
+  <hr>
+  <app-analisi-ordini></app-analisi-ordini>
+  <hr/>
+  <app-analisi-totale-torta></app-analisi-totale-torta>
+
+  <div class="mt-3 mb-3" style="text-align: center; color: slategray;">
+    <h3>Analisi in base al prodotto avanzata</h3>
+  </div>
+  <div class="container">
+    <div class="row">
+      <div class="col-3">
+        <p-calendar
+          [(ngModel)]="date1"
+          selectionMode="range"
+          [readonlyInput]="false"
+          inputId="range"
+          dateFormat="yy-mm-dd"
+          placeholder="Seleziona una data"
+          (onChange)="nonMostrare()"
+        ></p-calendar>
+      </div>
+      <div class="col-4">
+        <p-dropdown
+          [options]="nome"
+          [(ngModel)]="nomeSel"
+          placeholder="Seleziona un prodotto"
+          optionLabel="name"
+          [showClear]="true"
+          (onChange)="nonMostrare()"
+        ></p-dropdown>
+      </div>
+      <div class="col-1">
+        <button pButton pRipple type="button" icon="pi pi-search" (click)="elabora()" class="p-button-primary p-button-outlined"></button>
+      </div>
+      <div class="col-2">
+        <button pButton pRipple type="button" icon="fa fa-eye-slash" (click)="nonMostrare()" class="p-button-primary p-button-outlined"></button>
+      </div>
+    </div>
+  </div>
+
+  <app-analisi-dettaglio-articolo
+    *ngIf="flag"
+    [item]="nomeSel.name"
+    [date1]="date1"
+    class="mb-3 mt-3"
+    style="background-color: black"
+  ></app-analisi-dettaglio-articolo>
+  <hr/>
+</p-card>

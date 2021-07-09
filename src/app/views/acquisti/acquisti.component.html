@@ -1,0 +1,44 @@
+<div class="card">
+    
+  <h1 style="text-align: center;padding: 6px;margin: 0;">Lista degli acquisti</h1>
+
+  <div *ngIf="errors.length === 0">
+
+    <app-table-row-expansion
+      [tableName]="tableName"
+      [rows]="acquisti"
+      [rowID]="rowID"
+      [expandedRowID]="expandedRowID"
+      [columns]="columns"
+      [columnsRowExpanded]="columnsRowExpanded"
+      [loading]="loading"
+      [totalRecords]="totalRecords"
+      [resultsPerPage]="resultsPerPage"
+      [reorderableColumns]="reorderableColumns"
+      [multiSort]="multiSort"
+      [search]="search"
+      [first]="first"
+      [showedAddArticolo]="showedAddArticolo"
+      (loadLazyEvent)="lazyLoad($event)"
+      (clickBtnEvent)="onClick($event)"
+      (changeResultsPerPageEvent)="onChangeResultsPerPage($event)"
+      (pageChanged)="onPageChanged($event)"
+      (generateToast)="generateToast($event)"
+      (searchEvent)="searchEvent($event)"
+      (sorting)="sorting($event)"
+      (onRowEditInitEvent)="OnRowEditInit($event)"
+      (onRowEditSaveEvent)="onRowEditSave($event)"
+      (onRowEditCancelEvent)="onRowEditCancel($event)"
+      (onRowEditInitAEvent)="OnRowEditInitA($event)"
+      (onRowEditSaveAEvent)="onRowEditSaveA($event)"
+      (onRowEditCancelAEvent)="onRowEditCancelA($event)"
+      (deleteAcquistoEvent)="deleteAcquisto($event)"
+      (deleteArticoloAcquistatoEvent)="deleteArticoloAcquistato($event)"
+      (addItemEvent)="addItem($event)">
+    </app-table-row-expansion> 
+
+    <p-toast [baseZIndex]="2000"></p-toast>
+      
+  </div>
+  
+</div>

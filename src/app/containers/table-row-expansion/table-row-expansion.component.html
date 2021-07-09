@@ -1,0 +1,249 @@
+<p-table #dt
+    [columns]="selectedColumns"
+    [value]="rows"
+    [lazy]="true"
+    (onLazyLoad)="onLazyLoad($event)"
+    [totalRecords]="totalRecords"
+    [paginator]="totalRecords == 0 ? false : true"
+    [rows]="resultsPerPage"
+    [responsive]="true"
+    [loading]="loading"
+    (onPage)="onPage($event)"
+    (onSort)="onSort($event)"
+    [(first)]="first"
+    [rows]="resultsPerPage"
+    [sortMode]="multiSort ? 'multiple' : singleSort ? 'single' : null"
+    [reorderableColumns]="reorderableColumns"
+    [dataKey]="rowID"
+    [editMode]="tableName === TableName.ACQUISTI ? 'row' : null">
+
+    <ng-template pTemplate="caption">
+        <div class="row">
+            <div class="col-md-4 align-self-center">
+                <p-multiSelect [options]="columns" [(ngModel)]="selectedColumns" optionLabel="header"
+                    selectedItemsLabel="{0} colonne selezionate" [style]="{minWidth: '200px'}" placeholder="Scegli le colonne">
+                </p-multiSelect>
+            </div>
+            <div class="col-md-4 align-self-center">
+                <div class="input-prepend input-group search">
+                    <div class="input-group-prepend">
+                      <span class="input-group-text"><i class="fa fa-search"></i></span>
+                    </div>
+                    <input type="search" class="text-center form-control" id="search" [placeholder]="search.placeholder" (input)="searchFn($event)" style="width:auto">
+                  </div>
+            </div>
+            <div class="col-md-2  align-self-center">
+
+            </div>
+            <div class="col-md-2  align-self-center" *ngIf="tableName == TableName.ORDINI">
+                <button type="button" pButton pRipple label="Aggiorna" icon="pi pi-spinner" [loading]="loadingSpinner"
+                    loadingIcon="pi pi-spin pi-spinner" class="p-button-raised p-button-help" (click)="loadOrdini()">
+                </button>
+            </div>
+        </div>
+    </ng-template>
+
+    <ng-template pTemplate="header">
+        <tr>
+            <th style="width: 3rem"></th>
+            <th *ngFor="let column of selectedColumns" [pSortableColumn]="!singleSort ? null : column.supplier ? 'fornitore.nome' : column.field" pReorderableColumn
+                style="text-align: center;">
+                {{column.header}}
+                <p-sortIcon *ngIf="singleSort" [field]="column.supplier ? 'fornitore.nome' : column.field"></p-sortIcon>
+            </th>
+            <th *ngIf="tableName === TableName.ACQUISTI"  style="width: 15rem"></th>
+        </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-row let-expanded="expanded" let-editing="editing" let-ri="rowIndex">
+        <tr [pEditableRow]="row">
+            <td>
+                <button type="button" pButton pRipple [pRowToggler]="row" class="p-button-text p-button-rounded p-button-plain"
+                    [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'">
+                </button>
+            </td>
+            <td pEditableColumn *ngFor="let col of selectedColumns" style="text-align: center;">
+                <ng-container [ngSwitch]="col.type === ColumnType.BOOLEAN ? 0 : col.type === ColumnType.CARICO_EFFETTUATO ? 1 :
+                col.editable ? 2 : 3">
+                    <ng-container *ngSwitchCase="0">
+                        <i *ngIf="row[col.field] === true" class="pi pi-check" style="font-size: 1.5rem"></i>
+                        <i *ngIf="row[col.field] === false" class="pi pi-times"style="font-size: 1.5rem" ></i>
+                    </ng-container>
+                    <ng-container *ngSwitchCase="1">
+                        <button type="button" pButton pRipple label="{{row[col.field] === true ? 'Carico effettuato' : 'Carica magazzino'}}"
+                            class="p-button-raised p-button-rounded {{row[col.field] === true ? 'p-button-success' : 'p-button-warning'}}"
+                            [disabled]="row[col.field] === true" (click)="onClick(row[rowID], ClickCarico)">
+                        </button>
+                    </ng-container>
+                    <ng-container *ngSwitchCase="2">
+                        <p-cellEditor>
+                            <ng-template pTemplate="input">
+                                <div *ngIf="editing">
+                                    <input pInputText type="text" [(ngModel)]="row[col.field]">
+                                </div>
+                                <div *ngIf="!editing">
+                                    {{row[col.field]}}
+                                </div>
+                            </ng-template>
+                            <ng-template pTemplate="output">
+                                {{row[col.field]}}
+                            </ng-template>
+                        </p-cellEditor>
+                    </ng-container>
+                    <ng-container *ngSwitchCase="3">
+                        {{col.supplier ? row.fornitore[col.field] : row[col.field]}}
+                    </ng-container>
+                </ng-container>
+            </td>
+            <td *ngIf="tableName === TableName.ACQUISTI" style="text-align: center;">
+                <button *ngIf="!editing" pButton pRipple type="button" pInitEditableRow icon="pi pi-pencil" (click)="onRowEditInit(row)" class="p-button-rounded p-button-text"></button>
+                <button pButton *ngIf="row.caricoEffettuato === false" pRipple type="button" icon="pi pi-plus" (click)="showAddArticolo(row)" class="p-button-rounded p-button-primary p-button-text"></button>
+                <button *ngIf="editing" pButton pRipple type="button" pSaveEditableRow icon="pi pi-check" (click)="onRowEditSave(row)" class="p-button-rounded p-button-text p-button-success p-mr-2"></button>
+                <button *ngIf="editing" pButton pRipple type="button" pCancelEditableRow icon="pi pi-times" (click)="onRowEditCancel(row, ri)" class="p-button-rounded p-button-text p-button-warning"></button>
+                <button pButton pRipple type="button" pCancelEditableRow icon="pi pi-trash" (click)="deleteAcquisto(row)" class="p-button-rounded p-button-text p-button-danger"></button>
+            </td>
+        </tr>
+    </ng-template>
+
+    <ng-template pTemplate="rowexpansion" let-row>
+        <tr>
+            <td [attr.colspan]="selectedColumns.length - columnsRowExpanded.length + 6 + (tableName === TableName.ACQUISTI ? 1 : 0)">
+                <div class="p-grid -fluid" style="font-size:16px;padding:20px">
+                    <p-table
+                        [value]="tableName === TableName.ORDINI ? row.articoliOrdinati : row.articoliAcquistati"
+                        dataKey="articoloAcquistatoId"
+                        [sortMode]="tableName === TableName.ACQUISTI ? null : multiSort ? 'multiple' : singleSort ? 'single' : null"
+                        [reorderableColumns]="reorderableColumns"
+                        [responsive]="true"
+                        [editMode]="tableName === TableName.ACQUISTI ? 'row' : null">
+                        <ng-template pTemplate="header">
+                            <tr>
+                                <th *ngFor="let col of columnsRowExpanded"
+                                    [pSortableColumn]="tableName === TableName.ACQUISTI ? null : singleSort ? col.field : null" pReorderableColumn
+                                    style="text-align: center;">
+                                    {{col.header}}
+                                    <p-sortIcon *ngIf="singleSort" [field]="col.field"></p-sortIcon>
+                                </th>
+                                <th style="width: 13rem"></th>
+                            </tr>
+                        </ng-template>
+                        <ng-template pTemplate="body" let-articolo let-editingArticolo="editing" let-riA="rowIndex">
+                            <tr [pEditableRow]="articolo">
+                                <td pEditableColumn *ngFor="let col of columnsRowExpanded" style="text-align: center;">
+                                    <div *ngIf="col.editable">
+                                        <p-cellEditor>
+                                            <ng-template pTemplate="input">
+                                                <div *ngIf="editingArticolo">
+                                                    <input pInputText type="text" [(ngModel)]="articolo[col.field]">
+                                                </div>
+                                                <div *ngIf="!editingArticolo">
+                                                    {{getExpandedRow(col, articolo)}}
+                                                </div>
+                                            </ng-template>
+                                            <ng-template pTemplate="output">
+                                                {{getExpandedRow(col, articolo)}}
+                                            </ng-template>
+                                        </p-cellEditor>
+                                    </div>
+                                    <div *ngIf="!col.editable">
+                                        {{getExpandedRow(col, articolo)}}
+                                    </div>
+                                </td>
+                                <td>
+                                    <button pButton type="button" icon="pi pi-search"
+                                        (click)="onClick((tableName === TableName.ORDINI ? articolo[expandedRowID] : articolo.articolo[expandedRowID]), ClickRow)">
+                                    </button>
+                                    <button pButton *ngIf="tableName === TableName.ACQUISTI && !editingArticolo && row.caricoEffettuato === false" type="button" pInitEditableRow icon="pi pi-pencil"
+                                        (click)="onRowEditInitA(articolo, riA)">
+                                    </button>
+                                    <button pButton *ngIf="tableName === TableName.ACQUISTI && editingArticolo && row.caricoEffettuato === false" type="button" pSaveEditableRow icon="pi pi-check"
+                                        (click)="onRowEditSaveA(articolo)" class="p-button-success">
+                                    </button>
+                                    <button pButton *ngIf="tableName === TableName.ACQUISTI && editingArticolo && row.caricoEffettuato === false" type="button" pCancelEditableRow icon="pi pi-times"
+                                        (click)="onRowEditCancelA(articolo, riA)" class="p-button-warning">
+                                    </button>
+                                    <button pButton *ngIf="tableName === TableName.ACQUISTI" type="button" pCancelEditableRow icon="pi pi-trash"
+                                        (click)="deleteArticoloAcquistato(articolo)" class="p-button-danger">
+                                    </button>
+                                </td>
+                            </tr>
+                        </ng-template>
+                        <ng-template pTemplate="emptymessage">
+                            <tr>
+                                <td colspan="6">Non ci sono articoli {{tableName === TableName.ORDINI ? "venduti" : "acquistati"}}</td>
+                            </tr>
+                        </ng-template>
+                    </p-table>
+                </div>
+            </td>
+        </tr>
+    </ng-template>
+
+    <ng-template pTemplate="summary">
+        {{ !loading ? (totalRecords === 0 ? 'Non ci sono elementi' : totalRecords === 1 ? 'C\'è un elemento' : 'Ci sono ' + totalRecords + ' elementi') : 'Caricamento...' }}
+    </ng-template>
+
+</p-table>
+
+<p-dialog header="Inserisci articolo" [(visible)]="showedAddArticolo" [draggable]="false" [resizable]="false" [style]="{width: '27vw'}">
+    <div class="row">
+        <div class="col-8">
+            <p-autoComplete appendTo="body" [(ngModel)]="selectedItem" [size]="25" [minLength]="3" [suggestions]="articoli" [showEmptyMessage]="true" (completeMethod)="filter($event)"></p-autoComplete>
+        </div>
+        <div class="col-4">
+            <button type="button" pButton pRipple label="Aggiungi" (click)="add()"
+                class="p-button-raised p-button-rounded p-button-success">
+            </button>
+        </div>
+    </div>
+</p-dialog>
+
+<p-dialog header="{{articoloSelezionato.titolo}}" [draggable]="false" [resizable]="false" [(visible)]="display && articoloSelezionato" [style]="{width: '35vw'}">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-6">
+                <img src="{{articoloSelezionato.pathImmagine}}" class="rounded" alt="IMMAGINE" [style]="{'height': '250px', 'width': '230px'}">
+            </div>
+            <div class="col-sm-6">
+                <div class="row">
+                    <div class="col-12 col-sm-12">
+                        <b>ASIN:</b> {{articoloSelezionato.asin}}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12 col-sm-12">
+                        <b>Categoria:</b> {{articoloSelezionato.categoria}}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12 col-sm-12">
+                        <b>Brand:</b> {{articoloSelezionato.brand}}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12 col-sm-12">
+                        <b>Prezzo:</b> {{articoloSelezionato.prezzo}} €
+                    </div>
+                </div>
+                <div  class="row">
+                    <div class="col-12 col-sm-12">
+                        <b>Giacenza:</b> {{articoloSelezionato.giacenza}}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12 col-sm-12">
+                        <b>Soglia disponibilità bassa:</b> {{articoloSelezionato.sogliaDisponibilitaBassa}}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <p-footer>
+        <button type="button" pButton pRipple label="Vai al dettaglio" (click)="dettaglio(articoloSelezionato.asin)"
+            class="p-button-raised p-button-rounded p-button-info">
+        </button>
+        <button type="button" pButton pRipple label="Ok" (click)="closeDialog()"
+            class="p-button-raised p-button-rounded p-button-success">
+        </button>
+    </p-footer>
+</p-dialog>

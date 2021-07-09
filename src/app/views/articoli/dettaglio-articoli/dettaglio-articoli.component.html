@@ -1,0 +1,42 @@
+<div *ngIf="this.articolo" class="container-fluid" class="mt-3">
+    <p-card styleClass="p-card-shadow">
+        <h1 style="text-align: center;">{{this.articolo.titolo}}</h1>
+        <br />
+        <ng-template pTemplate="footer">
+            <img [src]="this.articolo.pathImmagine" [alt]="this.articolo.pathImmagine"
+                [style]="{height:'260px', width:'260px', 'margin-left': '150px', float:'left'}" />
+            <table class="table-fixed">
+                <tbody>
+                    <tr>
+                        <td><b>ASIN:</b></td>
+                        <td>{{this.articolo.asin}}</td>
+                    </tr>
+                    <tr>
+                        <td><b>CATEGORIA:</b></td>
+                        <td>{{this.articolo.categoria}}</td>
+                    </tr>
+                    <tr>
+                        <td><b>PREZZO:</b></td>
+                        <td>{{this.articolo.prezzo}}€</td>
+                    </tr>
+                    <tr>
+                        <td><b>GIACENZA:</b></td>
+                        <td>{{this.articolo.giacenza}}</td>
+                    </tr>
+                    <tr>
+                        <td><b>BRAND:</b></td>
+                        <td>{{this.articolo.brand}}</td>
+                    </tr>
+                    <tr>
+                        <td><b>SOGLIA DISPONIBILITA BASSA:</b></td>
+                        <td>{{this.articolo.sogliaDisponibilitaBassa}}</td>
+                    </tr>
+                </tbody>
+            </table>
+            <app-analisi-dettaglio-articolo [item]="this.articolo.titolo" [date1]="date1" class="mb-3 mt-3">
+            </app-analisi-dettaglio-articolo>
+        </ng-template>
+        <hr />
+    </p-card>
+</div>
+<p-toast [baseZIndex]="2000"></p-toast>

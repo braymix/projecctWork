@@ -1,0 +1,38 @@
+<div *ngIf="!errorFlag">
+  <div class="container">
+    <div class="row mt-3">
+      <div class="col">
+        <p-card>
+          <div>
+            <b>Totale ricavi dal </b>{{ dataInizio }} <b>al</b>
+            {{ dataFine }} :
+            <span style="color: limegreen;">{{ totaleGuadagno }} €</span>
+          </div>
+          <div>
+            <b>Numero totale articoli acquistati dal </b> {{ dataInizio }}
+            <b>al</b> {{ dataFine }} :<font style="color: limegreen;">
+              {{ nArtOrd }}
+            </font>
+          </div>
+        </p-card>
+      </div>
+    </div>
+    <div class="row mt-3">
+      <div class="col">
+        <p-card [style]="{'background-color': '#FCFFFF'}" subheader="Grafico vendite per città">
+          <p-chart type="pie" [data]="dataProdotto"></p-chart>
+        </p-card>
+      </div>
+      <div class="col">
+        <p-card subheader="Grafico vendite">
+          <p-chart
+            type="line"
+            [data]="basicData"
+            [options]="basicOptions"
+          ></p-chart>
+        </p-card>
+      </div>
+    </div>
+  </div>
+</div>
+<p-toast [baseZIndex]="2000"></p-toast>
